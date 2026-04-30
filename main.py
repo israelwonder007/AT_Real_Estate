@@ -15,27 +15,38 @@ def main():
     BASE_DIR = Path(__file__).resolve().parent
     DATA_PATH = BASE_DIR / "data" / "alloy_dataset.csv"
 
-    # 1. Load data
+    # Load data
     df = load_data(DATA_PATH)
 
-    # 2. Clean data
+    # Clean data
     df = clean_data(df)
 
-    # 3. Feature engineering
+    # Feature engineering
     df = engineer_features(df)
 
-    # 4. Feature selection
+    # Feature selection
     X, y = select_features(df)
 
-    # 5. Train model
+    # SAVE SELECTED FEATURES HERE
+    output_dir = BASE_DIR / "data" / "selection"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    df_final = X.copy()
+    df_final["last_sale_price"] = y
+
+    df_final.to_csv(output_dir / "final_selected_features.csv", index=False)
+
+    # Train model
     model, X_test, y_test = train_model(X, y)
 
-    # 6. Evaluate model
-    rmse, r2 = evaluate_model(model, X_test, y_test)
+    # Evaluate model
+    rmse, r2, mse, mae = evaluate_model(model, X_test, y_test)
 
     print("\n===== MODEL PERFORMANCE =====")
     print("RMSE:", rmse)
     print("R² Score:", r2)
+    print("MSE:", mse)
+    print("MAE:", mae)
 
 if __name__ == "__main__":
     main()

@@ -13,7 +13,9 @@ def clean_data(df):
     # Drop irrelevant columns
     df = df.drop(columns=[
         'property_id', 'id', 'zip_code', 'county', 'full_address', 'street_address',
-        'unit', 'owner_name', 'assessor_id'
+        'unit', 'tax_year', 'year_built', 'annual_tax', 
+        # 'price_per_sqft', 
+        'owner_name', 'assessor_id'
     ], errors='ignore')
 
     # Fix invalid coordinates

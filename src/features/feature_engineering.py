@@ -1,16 +1,27 @@
-# ✅ segment models
-# Strong Project Insight (Use This in Report)
+# # src/features/feature_engineering.py
 
-# You can say:
+# import pandas as pd
 
-# “Property type segmentation revealed significant 
-# variation in distribution and likely pricing behavior, 
-# making it a critical feature for downstream modeling 
-# and recommendation systems.”
-# for ptype in df["property_type"].unique():
-#     subset = df[df["property_type"] == ptype]
+# def engineer_features(df):
 
-# src/features/feature_engineering.py
+#     # Ratio features
+#     df['price_per_bedroom'] = df['last_sale_price'] / df['bedrooms']
+#     df['price_per_bathroom'] = df['last_sale_price'] / df['bathrooms']
+
+#     # Date features
+#     df['sale_year'] = df['last_sale_date'].dt.year
+#     df['sale_month'] = df['last_sale_date'].dt.month
+
+#     df = df.drop(columns=['last_sale_date'], errors='ignore')
+
+#     # One-hot encoding
+#     df = pd.get_dummies(
+#         df,
+#         columns=['property_type', 'city', 'state'],
+#         drop_first=True
+#     )
+
+#     return df
 
 import pandas as pd
 
@@ -26,31 +37,26 @@ def engineer_features(df):
 
     df = df.drop(columns=['last_sale_date'], errors='ignore')
 
-    # One-hot encoding
+    # -----------------------------
+    # TARGET ENCODING FOR CITY
+    # -----------------------------
+    city_target_mean = df.groupby('city')['last_sale_price'].mean()
+
+    df['city_encoded'] = df['city'].map(city_target_mean)
+
+    # Handle missing (just in case)
+    df['city_encoded'] = df['city_encoded'].fillna(df['last_sale_price'].mean())
+
+    # Drop original city column
+    df = df.drop(columns=['city'])
+
+    # -----------------------------
+    # ONE-HOT FOR LOW CARDINALITY
+    # -----------------------------
     df = pd.get_dummies(
         df,
-        columns=['property_type', 'city', 'state', 'building_age_grp'],
+        columns=['property_type', 'state'],
         drop_first=True
     )
 
     return df
-
-
-
-# import numpy as np
-
-# def engineer_features(df):
-
-#     df['price_per_sqft_calc'] = df['last_sale_price'] / df['sqft']
-#     df['log_sqft'] = np.log1p(df['sqft'])
-#     df['log_lot_size'] = np.log1p(df['lot_size_sqft'])
-
-#     df['price_per_bedroom'] = df['last_sale_price'] / df['bedrooms']
-#     df['price_per_bathroom'] = df['last_sale_price'] / df['bathrooms']
-
-#     df['sale_year'] = df['last_sale_date'].dt.year
-#     df['sale_month'] = df['last_sale_date'].dt.month
-
-#     df = df.drop(columns=['last_sale_date'])
-
-#     return df
